@@ -15,7 +15,7 @@ public class NewsScraper {
     private static final TagesschauAPI api = new TagesschauAPI();
 
     public static void main(String[] args) throws IOException {
-        ArrayList<NewsEntry> entries = api.fetchNews(7);
+        ArrayList<NewsEntry> entries = api.fetchNews(7, true);
         FileWriter writer = new FileWriter("news.txt");
         for (NewsEntry entry : entries) {
             writer.append(entry.getTitle()).append("\n");

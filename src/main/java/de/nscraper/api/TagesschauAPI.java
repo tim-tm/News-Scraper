@@ -30,9 +30,10 @@ public class TagesschauAPI {
      * Fetch the news using the Tagesschau APIv2
      *
      * @param date Date in yyMMdd format.
+     * @param onlyBreaking Should only breaking-news be listed?
      * @return List of News that were fetched.
      */
-    public ArrayList<NewsEntry> fetchNews(String date) {
+    public ArrayList<NewsEntry> fetchNews(String date, boolean onlyBreaking) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(buildNewsURL(date)))
                 .header("Content-Type", "application/json")
@@ -56,7 +57,11 @@ public class TagesschauAPI {
         for (int i = 0; i < news.length(); i++) {
             JSONObject obj = news.getJSONObject(i);
             if (obj.has("type") && obj.getString("type").equals("video")) continue;
-            entries.add(new NewsEntry(obj.getString("title"), obj.getString("date"), obj.getString("shareURL")));
+
+            String title = obj.getString("title");
+            if (onlyBreaking && !title.contains("+")) continue;
+
+            entries.add(new NewsEntry(title, obj.getString("date"), obj.getString("shareURL")));
         }
         return entries;
     }
@@ -64,24 +69,26 @@ public class TagesschauAPI {
     /**
      * Fetch the daily news using the Tagesschau APIv2
      *
+     * @param onlyBreaking Should only breaking-news be listed?
      * @return List of News that were fetched.
      */
-    public ArrayList<NewsEntry> fetchNews() {
-        return fetchNews(formatCurrentTime());
+    public ArrayList<NewsEntry> fetchNews(boolean onlyBreaking) {
+        return fetchNews(formatCurrentTime(), onlyBreaking);
     }
 
     /**
      * Fetch news from a time until now using the Tagesschau APIv2
      *
      * @param days Days to go back.
+     * @param onlyBreaking Should only breaking-news be listed?
      * @return List of News that were fetched.
      */
-    public ArrayList<NewsEntry> fetchNews(int days) {
+    public ArrayList<NewsEntry> fetchNews(int days, boolean onlyBreaking) {
         ArrayList<NewsEntry> entries = new ArrayList<>();
-        for (int i = days-1; i >= 0; i--) {
+        for (int i = days - 1; i >= 0; i--) {
             String date = formatTime(LocalDateTime.now().minusDays(i));
             System.out.println(date);
-            entries.addAll(fetchNews(date));
+            entries.addAll(fetchNews(date, onlyBreaking));
         }
         return entries;
     }

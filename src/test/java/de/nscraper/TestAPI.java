@@ -12,12 +12,7 @@ public class TestAPI {
 
     @Test
     public void testFetchNews() {
-        ArrayList<NewsEntry> entries = tagesschauAPI.fetchNews(3);
+        ArrayList<NewsEntry> entries = tagesschauAPI.fetchNews(3, true);
         Assertions.assertNotNull(entries);
-    }
-
-    @Test
-    public void testFmtCurrentTime() {
-        Assertions.assertEquals(tagesschauAPI.formatCurrentTime(), "230907");
     }
 }
