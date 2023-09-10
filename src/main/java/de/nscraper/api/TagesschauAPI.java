@@ -13,6 +13,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 /**
+ * This is a simple interface to easily use the <a href="https://tagesschau.api.bund.dev/">TagesschauAPIv2</a>.
+ *
  * @author Tim
  */
 @SuppressWarnings("unused")
@@ -29,7 +31,7 @@ public class TagesschauAPI {
     /**
      * Fetch the news using the Tagesschau APIv2
      *
-     * @param date Date in yyMMdd format.
+     * @param date         Date in yyMMdd format.
      * @param onlyBreaking Should only breaking-news be listed?
      * @return List of News that were fetched.
      */
@@ -50,20 +52,7 @@ public class TagesschauAPI {
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
-
-        ArrayList<NewsEntry> entries = new ArrayList<>();
-        JSONObject object = new JSONObject(res);
-        JSONArray news = object.getJSONArray("news");
-        for (int i = 0; i < news.length(); i++) {
-            JSONObject obj = news.getJSONObject(i);
-            if (obj.has("type") && obj.getString("type").equals("video")) continue;
-
-            String title = obj.getString("title");
-            if (onlyBreaking && !title.contains("+")) continue;
-
-            entries.add(new NewsEntry(title, obj.getString("date"), obj.getString("shareURL")));
-        }
-        return entries;
+        return parseResponse(res, onlyBreaking);
     }
 
     /**
@@ -79,7 +68,7 @@ public class TagesschauAPI {
     /**
      * Fetch news from a time until now using the Tagesschau APIv2
      *
-     * @param days Days to go back.
+     * @param days         Days to go back.
      * @param onlyBreaking Should only breaking-news be listed?
      * @return List of News that were fetched.
      */
@@ -93,16 +82,107 @@ public class TagesschauAPI {
         return entries;
     }
 
+    /**
+     * Parse the incoming response from the TagesschauAPI.
+     *
+     * @param res          Response body
+     * @param onlyBreaking Should only breaking-news be listed?
+     * @return List of NewsEntries containing the important information.
+     */
+    private ArrayList<NewsEntry> parseResponse(String res, boolean onlyBreaking) {
+        ArrayList<NewsEntry> entries = new ArrayList<>();
+        JSONObject object = new JSONObject(res);
+        JSONArray news = object.getJSONArray("news");
+
+        for (int i = 0; i < news.length(); i++) {
+            JSONObject obj = news.getJSONObject(i);
+            if (obj.has("type") && obj.getString("type").equals("video")) continue;
+
+            String title = obj.getString("title");
+            if (onlyBreaking && !title.contains("+")) continue;
+            NewsEntry entry = new NewsEntry(title, obj.getString("date"), obj.getString("shareURL"));
+
+            if (obj.has("tags")) {
+                JSONArray tags = obj.getJSONArray("tags");
+
+                for (int j = 0; j < tags.length(); j++) {
+                    String value = tags.getJSONObject(j).getString("tag");
+                    entry.addTag(new NewsEntry.NewsTag(value));
+                }
+            }
+            entries.add(entry);
+        }
+
+        computeFrequency(entries);
+        return entries;
+    }
+
+    /**
+     * Compute how often the tag appears in all tags for every tag.
+     *
+     * @param entries NewsEntries
+     */
+    private void computeFrequency(ArrayList<NewsEntry> entries) {
+        ArrayList<String> tags = new ArrayList<>();
+        for (NewsEntry entry : entries) {
+            for (NewsEntry.NewsTag tag : entry.getTags()) {
+                tags.add(tag.getValue());
+            }
+        }
+
+        for (String tag : tags) {
+            double n = 0;
+            for (String s : tags) {
+                if (s.equals(tag)) {
+                    ++n;
+                }
+            }
+            for (NewsEntry entry : entries) {
+                for (NewsEntry.NewsTag entryTag : entry.getTags()) {
+                    if (entryTag.getValue().equals(tag)) {
+                        entryTag.setFrequency(n / tags.size());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Format any time.
+     *
+     * @param time The time you want to format.
+     * @return Provided time as a string in yyMMdd format
+     */
     private String formatTime(LocalDateTime time) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyMMdd");
         return dtf.format(time);
     }
 
-    public String formatCurrentTime() {
+    /**
+     * Format the current (system) time to yyMMdd format.
+     *
+     * @return Date-String in yyMMdd format
+     */
+    private String formatCurrentTime() {
         return formatTime(LocalDateTime.now());
     }
 
+    /**
+     * Make the news-endpoint url-string for any date.
+     *
+     * @param date The date in yyMMdd format
+     * @return url of the news-endpoint (e.g. <a href="https://www.tagesschau.de/api2u/news?date=230910">news-endpoint</a>)
+     */
     private String buildNewsURL(String date) {
         return TS_NEWS + "?date=" + date;
+    }
+
+    /**
+     * Sort the given news by tag-frequency.
+     *
+     * @param entries NewsEntries
+     */
+    public void sortByTags(ArrayList<NewsEntry> entries) {
+        entries.sort((a, b) -> Double.compare(b.getTagFrequency(), a.getTagFrequency()));
     }
 }
