@@ -1,3 +1,7 @@
-.idea
-out
-target
+.idea/
+out/
+target/
+.settings/
+.classpath
+.project
+news.txt

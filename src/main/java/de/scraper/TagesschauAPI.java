@@ -1,4 +1,4 @@
-package de.nscraper.api;
+package de.scraper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package de.nscraper.api;
+package de.scraper;
 
 import java.util.ArrayList;
 
