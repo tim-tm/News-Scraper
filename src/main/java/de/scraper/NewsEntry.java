@@ -3,15 +3,24 @@ package de.scraper;
 import java.util.ArrayList;
 
 /**
+ * An object to store the responses from various news API's.
+ *
  * @author Tim
+ * @since 0.0.1
  */
-@SuppressWarnings("unused")
 public class NewsEntry {
     private String title;
     private String date;
     private String shareURL;
     private ArrayList<NewsTag> tags;
 
+    /**
+     * This will initialize a new NewsEntry.
+     *
+     * @param title The title of an article
+     * @param date When was the article released?
+     * @param shareURL The url to access the article
+     */
     public NewsEntry(String title, String date, String shareURL) {
         this.title = title;
         this.date = date;
@@ -19,10 +28,20 @@ public class NewsEntry {
         this.tags = new ArrayList<>();
     }
 
+    /**
+     * Add NewsTags to an NewsEntry.
+     *
+     * @param tag The NewsTag that will be added.
+     */
     public void addTag(NewsTag tag) {
         this.tags.add(tag);
     }
 
+    /**
+     * Find the biggest frequency of every tag store in a NewsEntry.
+     *
+     * @return The biggest tag-frequency in the collection of NewsTags.
+     */
     public double getTagFrequency() {
         double d = 0;
         for (NewsTag tag : this.tags) {
@@ -65,6 +84,12 @@ public class NewsEntry {
         this.tags = tags;
     }
 
+    /**
+     * Each NewsEntry stores a collection of NewsTags in order to sort them by the tag that occours the most.
+     *
+     * @author Tim
+     * @since 0.0.1
+     */
     public static final class NewsTag {
         private String value;
         private double frequency;

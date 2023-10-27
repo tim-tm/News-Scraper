@@ -37,4 +37,19 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <reportOutputDirectory>${basedir}/docs</reportOutputDirectory>  
+                    <source>16</source>    
+                    <target>16</target>    
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

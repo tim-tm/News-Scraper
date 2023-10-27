@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"de.scraper","l":"NewsEntry"},{"p":"de.scraper","l":"NewsEntry.NewsTag"},{"p":"de.scraper","l":"TagesschauAPI"}];updateSearchResults();

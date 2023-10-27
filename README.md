@@ -3,7 +3,8 @@
 This is a little java library for fetching news. This is a fork of [David's New-Scraper](https://github.com/sk3tchDavid/Google-News-Scraper).
 
 ## Documentation
-Coming soon...
+
+Open the [index.html](https://github.com/tim-tm/news-scraper/tree/main/docs/apidocs/index.html) in any browser to see the JavaDoc.
 
 ## API's
 

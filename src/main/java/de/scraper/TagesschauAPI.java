@@ -16,14 +16,17 @@ import java.util.ArrayList;
  * This is a simple interface to easily use the <a href="https://tagesschau.api.bund.dev/">TagesschauAPIv2</a>.
  *
  * @author Tim
+ * @since 0.0.1
  */
-@SuppressWarnings("unused")
 public class TagesschauAPI {
     private static final String TS_ENDPOINT = "https://www.tagesschau.de/api2u";
     private static final String TS_NEWS = TS_ENDPOINT + "/news";
 
     private final HttpClient client;
 
+    /**
+     * Simple constructor, no parameters. Will still need to be called since there are no static methods.
+     */
     public TagesschauAPI() {
         this.client = HttpClient.newHttpClient();
     }
